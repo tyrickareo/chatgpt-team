@@ -39,6 +39,12 @@ Different prompts answering your questions simultaneously.
 
 ![并发男友](demos/concurrent%20boyfriend.png)
 
+宝宝玩具房: 玩具们对一件'随机'事件的反应
+
+random bot reacting to a 'random' event
+
+![玩具房](demos/babyroom.png)
+
 ## get start
 
 clone repo
@@ -78,10 +84,11 @@ visit
 those above demos are all different strategies, you can choose one of them to make your chat-team story.
 
 目前实现的策略有:
- - ai主持人: 选定一个主持人让他决定下一个谁来发言
- - 用户主持: 你自己@人来让他们进行发言
- - 击鼓传花: 轮流发言
- - 简单并发: 同时回答你的提问
+
+- ai主持人: 选定一个主持人让他决定下一个谁来发言
+- 用户主持: 你自己@人来让他们进行发言
+- 击鼓传花: 轮流发言
+- 简单并发: 同时回答你的提问
 
 ## Roadmap
 
@@ -106,5 +113,6 @@ those above demos are all different strategies, you can choose one of them to ma
     - [x] english
 
 ### wait for gpt4
+
     - a longer context will be much more helpful
 

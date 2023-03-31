@@ -3,7 +3,8 @@ import pathlib
 
 import gradio as gr
 
-from service.holder import ChatMessage, User, Holder, AIHolder, Bot, ChatMessageList, UserHolder, RoundRobin, Switch
+from service.holder import ChatMessage, User, Holder, AIHolder, Bot, ChatMessageList, UserHolder, RoundRobin, Switch, \
+    Random
 from service.llm import test_connection
 
 
@@ -25,6 +26,35 @@ def init_switch(meeting, progress):
         participants[p]["prompt"] = f"{participants[p]['prompt']}\n{meeting_prompt}"
         ml = ChatMessageList()
         bot = Bot(**participants[p], msg_list=ml)
+        the_holder.add_participant(bot)
+
+    progress(0.4)
+    the_holder.holder_note.append(dict(event="meeting_started", result=test_connection()))
+    progress(0.8)
+    return the_holder, user, gr.update(label=the_holder.meeting_about, visible=True), "\n".join(
+        [f"{p}({participants[p]['title']})" for p in participants]) + "\n\n\n-------------------\n" + readme
+
+
+def init_random(meeting, progress):
+    participants = meeting["participants"]
+    meeting_prompt = meeting["meeting_prompt"]
+    me = meeting["who_am_i"]
+    readme = meeting["readme"]
+    factor = meeting["strategy"]["factor"]
+    random_plot = meeting["strategy"]["random_plot"]
+
+    msg_list = ChatMessageList()
+    user = User(name=me["name"], title=me["title"], prompt=me["prompt"])
+
+    random = Random(user=user, msg_list=msg_list, factor=factor, random_plot=random_plot)
+    random.share_msg_with(user)
+    the_holder = Holder.new_meeting(
+        random, about=meeting["objective"])
+
+    for p in participants:
+        participants[p]["prompt"] = f"{participants[p]['prompt']}\n{meeting_prompt}"
+        bot = Bot(**participants[p])
+        random.share_msg_with(bot)
         the_holder.add_participant(bot)
 
     progress(0.4)
@@ -143,12 +173,16 @@ def create_meeting(meeting_name, meeting_setting, room, progress=gr.Progress()):
             holder, user, about, parti = init_switch(selected_meeting, progress)
             return holder, user, about, parti, True, gr.update(value="会议已开始", interactive=False), room, [
                 (None, holder.desc_meeting())], gr.update(placeholder="enter text", interactive=True)
+        case "random" | "Random" | "随机":
+            holder, user, about, parti = init_random(selected_meeting, progress)
+            return holder, user, about, parti, True, gr.update(value="会议已开始", interactive=False), room, [
+                (None, holder.desc_meeting())], gr.update(placeholder="enter text", interactive=True)
         case _:
             raise ValueError("no such strategy")
 
 
 def add_text(holder, user, text):
-    holder.input(ChatMessage(user_name="Rick", supplement="需求方", content=text))
+    holder.input(ChatMessage(user_name=user.name, supplement=user.title, content=text))
     return user.view(), "", gr.update(visible=False), gr.update(visible=True), gr.update(
         visible=True)
 

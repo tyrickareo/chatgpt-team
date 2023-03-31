@@ -1,4 +1,5 @@
 import json
+import random
 import re
 import time
 from typing import List, Dict, Tuple
@@ -329,6 +330,30 @@ class Switch(Strategy):
 
     def desc_this_meeting(self):
         return "all the bots speak at the same time"
+
+
+class Random(Strategy):
+    name = "Random"
+
+    # factor=0 means just one speak. factor > 0 means at least one speak. factor=1 means everyone speak
+    factor: float = 0.2
+    random_plot: bool = False
+
+    def next(self, *args, **kwargs) -> List[Tuple[Participant, str]]:
+        if not self.random_plot:
+            last = self.msg_list[0](index=-1)
+            if last.user_name in self.participants:
+                raise UserTurnInterrupt
+        result = [(p, "random") for p in self.participants.values() if random.random() < self.factor]
+        if not result:
+            result.append((random.choice(list(self.participants.values())), "random"))
+        return result
+
+    def desc_this_meeting(self):
+        return "randomly select one bot to speak"
+
+    def input(self, msg: ChatMessage):
+        self.msg_list[1](msg)
 
 
 class Holder(BaseModel):
