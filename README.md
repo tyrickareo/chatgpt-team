@@ -45,6 +45,12 @@ random bot reacting to a 'random' event
 
 ![玩具房](demos/babyroom.png)
 
+丢手绢: 每个ai发言完找另一个人来回答
+
+every bot pass the potato to another bot,or user
+
+![丢手绢](demos/hot%20potato.png)
+
 ## get start
 
 clone repo
@@ -89,6 +95,8 @@ those above demos are all different strategies, you can choose one of them to ma
 - 用户主持: 你自己@人来让他们进行发言
 - 击鼓传花: 轮流发言
 - 简单并发: 同时回答你的提问
+- 随机: 至少一个ai来回答你的问题
+- 丢手绢: 每个ai回答完后挑选一个ai来回答
 
 ## Roadmap
 
@@ -98,9 +106,9 @@ those above demos are all different strategies, you can choose one of them to ma
     - [√] round
     - [√] concurrency
     - [√] user hold
-    - [x] random
+    - [√] random
+    - [√] hot potato
     - [x] vote
-    - [x] hot potato
 
 ### persistence
 

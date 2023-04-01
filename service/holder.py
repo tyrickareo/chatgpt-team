@@ -356,6 +356,22 @@ class Random(Strategy):
         self.msg_list[1](msg)
 
 
+class HotPotato(AIHolder):
+    name = "HotPotato"
+    holder: Participant | None = None
+
+    def next(self, *args, **kwargs) -> List[Tuple[Participant, str]]:
+        if not self.holder:
+            self.holder = random.choice(list(self.participants.values()))
+        next_one = super().next()
+        self.holder = next_one[0][0]
+        return next_one
+
+    def desc_this_meeting(self):
+        keys = self.participants.keys()
+        return f"there are {len(keys)} people {','.join(keys)} in the room, and every bot chooses the next bot to speak after they finish speaking"
+
+
 class Holder(BaseModel):
     holder_note: List[Dict]
     strategy: Strategy

@@ -4,7 +4,7 @@ import pathlib
 import gradio as gr
 
 from service.holder import ChatMessage, User, Holder, AIHolder, Bot, ChatMessageList, UserHolder, RoundRobin, Switch, \
-    Random
+    Random, HotPotato
 from service.llm import test_connection
 
 
@@ -28,6 +28,32 @@ def init_switch(meeting, progress):
         bot = Bot(**participants[p], msg_list=ml)
         the_holder.add_participant(bot)
 
+    progress(0.4)
+    the_holder.holder_note.append(dict(event="meeting_started", result=test_connection()))
+    progress(0.8)
+    return the_holder, user, gr.update(label=the_holder.meeting_about, visible=True), "\n".join(
+        [f"{p}({participants[p]['title']})" for p in participants]) + "\n\n\n-------------------\n" + readme
+
+
+def init_hot_potato(meeting, progress):
+    participants = meeting["participants"]
+    meeting_prompt = meeting["meeting_prompt"]
+    readme = meeting["readme"]
+
+    msg_list = ChatMessageList()
+    ai_holder = HotPotato(msg_list=msg_list, choice_prompt=meeting["strategy"]["choice_prompt"])
+    the_holder = Holder.new_meeting(
+        ai_holder, about=meeting["objective"])
+    me = meeting["who_am_i"]
+    user = User(name=me["name"], title=me["title"], prompt=me["prompt"])
+    ai_holder.share_msg_with(user)
+    the_holder.add_participant(user)
+
+    for p in participants:
+        participants[p]["prompt"] = f"{participants[p]['prompt']}\n{meeting_prompt}"
+        bot = Bot(**participants[p])
+        ai_holder.share_msg_with(bot)
+        the_holder.add_participant(bot)
     progress(0.4)
     the_holder.holder_note.append(dict(event="meeting_started", result=test_connection()))
     progress(0.8)
@@ -175,6 +201,10 @@ def create_meeting(meeting_name, meeting_setting, room, progress=gr.Progress()):
                 (None, holder.desc_meeting())], gr.update(placeholder="enter text", interactive=True)
         case "random" | "Random" | "随机":
             holder, user, about, parti = init_random(selected_meeting, progress)
+            return holder, user, about, parti, True, gr.update(value="会议已开始", interactive=False), room, [
+                (None, holder.desc_meeting())], gr.update(placeholder="enter text", interactive=True)
+        case "hotpotato" | "HotPotato" | "丢手绢":
+            holder, user, about, parti = init_hot_potato(selected_meeting, progress)
             return holder, user, about, parti, True, gr.update(value="会议已开始", interactive=False), room, [
                 (None, holder.desc_meeting())], gr.update(placeholder="enter text", interactive=True)
         case _:
