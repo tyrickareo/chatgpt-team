@@ -53,6 +53,13 @@ every bot pass the potato to another bot,or user
 
 ## get start
 
+with docker:
+
+```
+docker run -d -p 8000:8000 -e api_key="<YOU_API_KEY>"  sanbazhang/chatgpt-team
+```
+
+or form source
 clone repo
 
 ```
