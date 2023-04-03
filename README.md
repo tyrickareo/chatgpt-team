@@ -49,7 +49,7 @@ random bot reacting to a 'random' event
 
 every bot pass the potato to another bot,or user
 
-![丢手绢](demos/hot%20potato.png)
+![丢手绢](demos/hotpotato.png)
 
 ## get start
 
